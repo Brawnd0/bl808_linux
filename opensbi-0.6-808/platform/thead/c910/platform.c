@@ -87,14 +87,16 @@ static int c910_early_init(bool cold_boot)
 		writel(tmp, (void *)(0x30007000));
 		/* pinmux */
 		tmp = readl((void *)(0x200008e4));
-		writel(0x00401502, (void *)0x200008e4); //IO8, TXD
-		writel(0x00401517, (void *)0x200008d8); //IO5, RXD
-		//UART_IntMask(UART_DBG_ID, UART_INT_ALL, MASK);
+		// writel(0x00401502, (void *)0x200008e4); //IO8, TXD
+		// writel(0x00401517, (void *)0x200008d8); //IO5, RXD
+		writel(0x00401502, (void *)0x20000904); // IO16, TXD
+		writel(0x00401517, (void *)0x20000908); // IO17, RXD
+		// UART_IntMask(UART_DBG_ID, UART_INT_ALL, MASK);
 		tmp = readl((void *)(BFLB_CONSOLE_BASE + UART_INT_MASK_OFFSET));
 		tmp |= 0xfff;
 		writel(tmp, (void *)(BFLB_CONSOLE_BASE + UART_INT_MASK_OFFSET));
 
-		//UART_Disable(UART_DBG_ID,UART_TXRX);
+		// UART_Disable(UART_DBG_ID,UART_TXRX);
 		tmp = readl(
 			(void *)(BFLB_CONSOLE_BASE + UART_UTX_CONFIG_OFFSET));
 		tmp &= UART_CR_UTX_EN_UMSK;
@@ -106,7 +108,7 @@ static int c910_early_init(bool cold_boot)
 		writel(tmp,
 		       (void *)(BFLB_CONSOLE_BASE + UART_URX_CONFIG_OFFSET));
 
-		//UART_Init(UART_DBG_ID, &uart_dbg_cfg);
+		// UART_Init(UART_DBG_ID, &uart_dbg_cfg);
 		tmp = BFLB_UART_CLK / BFLB_UART_BAUDRATE - 1;
 		tmp = (tmp << 16) | tmp;
 		writel(tmp, (void *)(BFLB_CONSOLE_BASE +
@@ -118,22 +120,22 @@ static int c910_early_init(bool cold_boot)
 		writel(0,
 		       (void *)(BFLB_CONSOLE_BASE + UART_DATA_CONFIG_OFFSET));
 		writel(0, (void *)(BFLB_CONSOLE_BASE + UART_SW_MODE_OFFSET));
-		//UART_FifoConfig(UART_DBG_ID,&fifoCfg);
+		// UART_FifoConfig(UART_DBG_ID,&fifoCfg);
 		writel(0xf0f0080,
 		       (void *)(BFLB_CONSOLE_BASE + UART_FIFO_CONFIG_1_OFFSET));
 		writel(0x80,
 		       (void *)(BFLB_CONSOLE_BASE + UART_FIFO_CONFIG_0_OFFSET));
-		//UART_TxFreeRun(UART_DBG_ID,ENABLE);
+		// UART_TxFreeRun(UART_DBG_ID,ENABLE);
 		writel(0xf04,
 		       (void *)(BFLB_CONSOLE_BASE + UART_UTX_CONFIG_OFFSET));
-		//UART_SetRxTimeoutValue(UART_DBG_ID,80);
+		// UART_SetRxTimeoutValue(UART_DBG_ID,80);
 		writel(0x4f,
 		       (void *)(BFLB_CONSOLE_BASE + UART_URX_RTO_TIMER_OFFSET));
-		//UART_IntMask(UART_DBG_ID,UART_INT_RX_FIFO_REQ,UNMASK);
+		// UART_IntMask(UART_DBG_ID,UART_INT_RX_FIFO_REQ,UNMASK);
 		tmp = readl((void *)(BFLB_CONSOLE_BASE + UART_INT_MASK_OFFSET));
 		tmp &= UART_CR_URX_FIFO_MASK_UMSK;
-		//writel(tmp, BFLB_CONSOLE_BASE + UART_INT_MASK_OFFSET);
-		//UART_Enable(UART_DBG_ID,UART_TXRX);
+		// writel(tmp, BFLB_CONSOLE_BASE + UART_INT_MASK_OFFSET);
+		// UART_Enable(UART_DBG_ID,UART_TXRX);
 		tmp = readl(
 			(void *)(BFLB_CONSOLE_BASE + UART_UTX_CONFIG_OFFSET));
 		tmp |= UART_CR_UTX_EN_MSK;

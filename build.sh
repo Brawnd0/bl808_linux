@@ -4,6 +4,9 @@ set -e
 SHELL_DIR=$(cd "$(dirname "$0")"; pwd)
 OUT_DIR=$SHELL_DIR/out
 
+#LINUX_DIR=$SHELL_DIR/linux-5.10.4-808
+LINUX_DIR=$SHELL_DIR/../linux
+
 CMAKE=$SHELL_DIR/toolchain/cmake/bin/
 
 LINUX_CROSS_PREFIX=$SHELL_DIR/toolchain/linux_toolchain/bin/riscv64-unknown-linux-gnu-
@@ -19,22 +22,22 @@ build_linux()
 {
     echo " "
     echo "================ build linux kernel ================"
-    cd $SHELL_DIR/linux-5.10.4-808
+    cd $LINUX_DIR
     if [ ! -f .config ]; then
         cp c906.config .config
     fi
     make ARCH=riscv CROSS_COMPILE=$LINUX_CROSS_PREFIX Image -j$(nproc)
     echo " "
     echo "=========== high compression kernel image =========="
-    lz4 -9 -f $SHELL_DIR/linux-5.10.4-808/arch/riscv/boot/Image $SHELL_DIR/linux-5.10.4-808/arch/riscv/boot/Image.lz4
-    cp $SHELL_DIR/linux-5.10.4-808/arch/riscv/boot/Image.lz4 $OUT_DIR
+    lz4 -9 -f $LINUX_DIR/arch/riscv/boot/Image $LINUX_DIR/arch/riscv/boot/Image.lz4
+    cp $LINUX_DIR/arch/riscv/boot/Image.lz4 $OUT_DIR
 }
 
 build_linux_config()
 {
     echo " "
     echo "============ build linux kernel config ============="
-    cd $SHELL_DIR/linux-5.10.4-808
+    cd $LINUX_DIR
     make ARCH=riscv CROSS_COMPILE=$LINUX_CROSS_PREFIX menuconfig -j$(nproc)
 }
 
@@ -51,9 +54,11 @@ build_dtb()
     echo " "
     echo "==================== build dtb ====================="
 
-    dtc -I dts -O dtb -o  $SHELL_DIR/bl808_dts/hw.dtb.5M $SHELL_DIR/bl808_dts/hw808c.dts
-    cp $SHELL_DIR/bl808_dts/hw.dtb.5M $OUT_DIR
+    #dtc -I dts -O dtb -o  $SHELL_DIR/bl808_dts/hw.dtb.5M $SHELL_DIR/bl808_dts/hw808c.dts
+    #cp $SHELL_DIR/bl808_dts/hw.dtb.5M $OUT_DIR
 
+    make ARCH=riscv CROSS_COMPILE=$LINUX_CROSS_PREFIX dtbs
+    cp $LINUX_DIR/arch/riscv/boot/dts/bouffalolab/ox64.dtb $OUT_DIR/hw.dtb.5M
 }
 
 build_low_load()
@@ -101,7 +106,7 @@ clean_all()
     find ./out ! -name 'squashfs_test.img' ! -name 'merge_7_5Mbin.py' -type f -exec rm -f {} +
     echo " "
     echo "================ clean kernel ================"
-    cd $SHELL_DIR/linux-5.10.4-808
+    cd $LINUX_DIR
     make ARCH=riscv CROSS_COMPILE=$LINUX_CROSS_PREFIX mrproper
     echo " "
     echo "================== clean opensbi ==================="
