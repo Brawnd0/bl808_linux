@@ -74,6 +74,21 @@ build_low_load()
 
 }
 
+build_hello_world()
+{
+    echo " "
+    echo "============== build helloworld ==============="
+    cd $SHELL_DIR/bl_mcu_sdk_bl808/
+    echo "make CHIP=bl808 CPU_ID=m0 CMAKE_DIR=$CMAKE CROSS_COMPILE=$NEWLIB_ELF_CROSS_PREFIX SUPPORT_DUALCORE=y APP_DIR=hellowd/helloworld APP=helloworld"
+    echo "make CHIP=bl808 CPU_ID=d0 CMAKE_DIR=$CMAKE CROSS_COMPILE=$NEWLIB_ELF_CROSS_PREFIX SUPPORT_DUALCORE=y APP_DIR=hellowd/helloworld APP==helloworld"
+    make CHIP=bl808 CPU_ID=m0 CMAKE_DIR=$CMAKE CROSS_COMPILE=$NEWLIB_ELF_CROSS_PREFIX SUPPORT_DUALCORE=y APP_DIR=examples APP=helloworld
+    make CHIP=bl808 CPU_ID=d0 CMAKE_DIR=$CMAKE CROSS_COMPILE=$NEWLIB_ELF_CROSS_PREFIX SUPPORT_DUALCORE=y APP_DIR=examples APP=helloworld
+
+    cp -f $SHELL_DIR/bl_mcu_sdk_bl808/out/examples/hellowd/helloworld/helloworld_bl808_m0.bin  $OUT_DIR
+    cp -f $SHELL_DIR/bl_mcu_sdk_bl808/out/examples/hellowd/helloworld/helloworld_bl808_d0.bin  $OUT_DIR
+
+}
+
 build_clean_load()
 {
     echo " "
@@ -96,6 +111,7 @@ build_all()
     build_linux
     build_dtb
     build_low_load
+    build_hello_world
     build_whole_bin
 }
 
@@ -137,6 +153,9 @@ dtb)
     ;;
 low_load)
     build_low_load
+    ;;
+hello_world)
+    build_hello_world
     ;;
 clean_load)
     build_clean_load

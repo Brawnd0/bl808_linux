@@ -22,13 +22,55 @@
  */
 #include "bflb_platform.h"
 #include "hal_uart.h"
+#include "hal_mtimer.h"
 
 int main(void)
 {
     bflb_platform_init(0);
+#ifdef CPU_M0
+    MSG("E907 start...\r\n");
+    mtimer_init();
+    MSG("mtimer clk:%d\r\n", CPU_Get_MTimer_Clock());
+
+    // how do we know psram clk init worked?
+    MSG("psram clk init ok!\r\n");
+    // MSG("m0 main! size_t:%d\r\n", sizeof(size_t));
+    bl_show_info();
+
+    csi_dcache_disable();
+
+#ifdef DUALCORE
+    BL_WR_WORD(IPC_SYNC_ADDR1, IPC_SYNC_FLAG);
+    BL_WR_WORD(IPC_SYNC_ADDR2, IPC_SYNC_FLAG);
+    // Clean cache at IPC_SYNC_ADDR1 0x40000000
+    L1C_DCache_Clean_By_Addr(IPC_SYNC_ADDR1, 8);
+#endif
+#endif
+
+#ifdef CPU_D0
+
+    // #define GLB_AHB_CLOCK_LZ4 (0x0008000000000000UL)
+
+    // GLB_PER_Clock_UnGate(GLB_AHB_CLOCK_LZ4);
+    MSG("C906 start...\r\n");
+    uint64_t start_time, stop_time;
+    mtimer_init();
+    MSG("mtimer clk:%d\r\n", CPU_Get_MTimer_Clock());
+    // MSG("C906 main! size_t:%d\r\n", sizeof(size_t));
+    bflb_platform_delay_ms(100);
+
+    bl_show_info();
+ #endif
+
+
 
     for (uint8_t i = 0; i < 10; i++) {
-        MSG("hello world!\r\n");
+#if defined(CPU_M0)
+        MSG("hello world from M0!\r\n");
+#elif defined(CPU_D0)
+        MSG("hello world from D0!\r\n");
+#endif
+        MSG("welcome to costco, I love you.\r\n");
         bflb_platform_delay_ms(200);
     }
 

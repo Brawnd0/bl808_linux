@@ -145,11 +145,13 @@ int main(void)
 
     MSG("psram clk init ok!\r\n");
     // MSG("m0 main! size_t:%d\r\n", sizeof(size_t));
+    bl_show_info();
 
     csi_dcache_disable();
 #ifdef DUALCORE
     BL_WR_WORD(IPC_SYNC_ADDR1, IPC_SYNC_FLAG);
     BL_WR_WORD(IPC_SYNC_ADDR2, IPC_SYNC_FLAG);
+    // Clean cache at IPC_SYNC_ADDR1 0x40000000
     L1C_DCache_Clean_By_Addr(IPC_SYNC_ADDR1, 8);
 #endif
     while (1) {
@@ -174,6 +176,8 @@ int main(void)
     MSG("mtimer clk:%d\r\n", CPU_Get_MTimer_Clock());
     // MSG("C906 main! size_t:%d\r\n", sizeof(size_t));
     bflb_platform_delay_ms(100);
+
+    bl_show_info();
 
     void (*opensbi)(int hart_id, int fdt_addr) = (void (*)(int hart_id, int fdt_addr))OPENSBI_DST_ADDR;
 
