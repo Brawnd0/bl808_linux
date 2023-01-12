@@ -38,8 +38,10 @@ int main(void)
     bl_show_info();
 
     // Disable and invalidate all dcache
-    // csi_dcache_disable();
+    // D0 will still run without this
+    csi_dcache_disable();
 
+// D0 will NOT run without this running in m0
 #ifdef DUALCORE
     BL_WR_WORD(IPC_SYNC_ADDR1, IPC_SYNC_FLAG);
     BL_WR_WORD(IPC_SYNC_ADDR2, IPC_SYNC_FLAG);
