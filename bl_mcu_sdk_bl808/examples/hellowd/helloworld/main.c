@@ -39,12 +39,12 @@ int main(void)
 
     csi_dcache_disable();
 
-#ifdef DUALCORE
-    BL_WR_WORD(IPC_SYNC_ADDR1, IPC_SYNC_FLAG);
-    BL_WR_WORD(IPC_SYNC_ADDR2, IPC_SYNC_FLAG);
-    // Clean cache at IPC_SYNC_ADDR1 0x40000000
-    L1C_DCache_Clean_By_Addr(IPC_SYNC_ADDR1, 8);
-#endif
+// #ifdef DUALCORE
+//     BL_WR_WORD(IPC_SYNC_ADDR1, IPC_SYNC_FLAG);
+//     BL_WR_WORD(IPC_SYNC_ADDR2, IPC_SYNC_FLAG);
+//     // Clean cache at IPC_SYNC_ADDR1 0x40000000
+//     L1C_DCache_Clean_By_Addr(IPC_SYNC_ADDR1, 8);
+// #endif
 #endif
 
 #ifdef CPU_D0
@@ -60,7 +60,16 @@ int main(void)
     bflb_platform_delay_ms(100);
 
     bl_show_info();
- #endif
+
+    csi_dcache_disable();
+
+#ifdef DUALCORE
+    BL_WR_WORD(IPC_SYNC_ADDR1, IPC_SYNC_FLAG);
+    BL_WR_WORD(IPC_SYNC_ADDR2, IPC_SYNC_FLAG);
+    // Clean cache at IPC_SYNC_ADDR1 0x40000000
+    L1C_DCache_Clean_By_Addr(IPC_SYNC_ADDR1, 8);
+#endif
+#endif
 
 
 
